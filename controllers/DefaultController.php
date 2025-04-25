@@ -15,6 +15,8 @@ class DefaultController extends Controller
      */
     public function actionIndex()
     {
+        return $this->redirect(['link/create']);
+        
         return $this->render('index');
     }
 }
