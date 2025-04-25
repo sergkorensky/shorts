@@ -76,17 +76,21 @@ class Link extends \yii\db\ActiveRecord
         $client = new \GuzzleHttp\Client();
         
         try{
-            $httpResponse = $client->options($this->$attribute);
+            $httpResponse = $client->get($this->$attribute);
             $statusCode = $httpResponse->getStatusCode();
+            //echo $statusCode;
         }catch(\Exception $e){
             $statusCode = 500;            
         }
         
         if ($statusCode >= 400) {
+            
             $this->addError($attribute, 'Данный url недоступен');
         }else{
             
         }
     }
+
+    
 
 }

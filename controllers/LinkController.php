@@ -97,9 +97,19 @@ class LinkController extends Controller
 
                 if (count($model->errors) > 0) {
                     return $t;
-                 } else {// save onChange
-                    //$model->save();
-                    //echo $model->id;
+                 } else {//save and response json
+                    $model->save();
+                    $new_id = $model->id;
+                    $short_url = Html::a(\Yii::$app->urlManager->hostInfo . Url::to(['goto','q'=>$new_id]),Url::to(['goto','q'=>$new_id]));
+                    $data = [
+                        
+                        'id' => $model->id,
+                        'short_url' => $short_url,
+                    ];
+
+                    //return $this->redirect(['view', 'id' => $model->id]);
+                    
+                    return $data;
 
                  }
 
@@ -108,13 +118,12 @@ class LinkController extends Controller
 
         
 
-            if (0 && $model->load($this->request->post()) && $model->save()) {//это надо заменить на валидацию по ajax и в случае успеха - сохранение и ответу
+            if (0 && $model->load($this->request->post()) && $model->save()) {//это надо заменили на валидацию по ajax и в случае успеха - сохранение и ответ
 
                 if(\Yii::$app->request->isAjax){
                     //return $model->id;
 
-                    //$new_id = $model->id;
-                    //return Html::a(\Yii::$app->urlManager->hostInfo . Url::to(['goto','q'=>$new_id]),Url::to(['goto','q'=>$new_id]));//
+                    
                 }
 
 
