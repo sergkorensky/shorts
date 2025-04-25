@@ -13,6 +13,7 @@ use yii\filters\VerbFilter;
 use yii\helpers\Url;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
+use Da\QrCode\QrCode;
 
 /**
  * LinkController implements the CRUD actions for Link model.
@@ -103,10 +104,12 @@ class LinkController extends Controller
                     $model->save();
                     $new_id = $model->id;
                     $short_url = Html::a(\Yii::$app->urlManager->hostInfo . Url::to(['goto','q'=>$new_id]),Url::to(['goto','q'=>$new_id]));
-                    $data = [
-                        
+                    $qr_url = Url::to(['qr','q'=>$new_id]);
+                    $data = [                        
                         'id' => $model->id,
                         'short_url' => $short_url,
+                        'qr_url' => $qr_url,
+                                                
                     ];
                                         
                     return $data;
@@ -214,6 +217,38 @@ class LinkController extends Controller
         
         return $this->redirect($link_url);
     }
+
+
+    /**
+     * Generates QR, writes it and return its url  
+     * @param int $q 
+     * @return \yii\web\Response
+     * @throws NotFoundHttpException if the model cannot be found
+     */
+    public function actionQr($q)
+    {
+        $link = $this->findModel($q);
+
+        $link_url = $link->url;
+
+        $ourUrl = \Yii::$app->urlManager->hostInfo . Url::to(['goto','q'=>$q]);
+
+        $qrCode = (new QrCode($ourUrl))
+            ->setSize(250)
+            ->setMargin(5)
+            ->setBackgroundColor(255, 255, 255);
+        
+        $this->response->format = Response::FORMAT_RAW;//Response::FORMAT_HTML 
+        $path = \Yii::$app->assetManager->basePath."/qr_${q}.png";
+        $qrCode->writeFile($path); 
+        $this->response->data = \Yii::$app->urlManager->hostInfo .'/assets'."/qr_${q}.png";      
+               
+
+        return $this->response;
+    }
+
+
+
 
     /**
      * Finds the Link model based on its primary key value.

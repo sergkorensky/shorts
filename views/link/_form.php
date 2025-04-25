@@ -29,6 +29,7 @@ use yii\widgets\ActiveForm;
        
     ?>
     <div id="short_res"></div>
+    <div id="qr"></div>
 
 </div>
 
@@ -47,7 +48,16 @@ $js2 = "$('#link-form').on('ajaxComplete', function (event, jqXHR, textStatus) {
 
     if(res.id) {
                     var short_link = res.short_url;
-                    $('#short_res').html(short_link);                    
+                    $('#short_res').html(short_link);
+                    $.ajax({
+                        url:res.qr_url, 
+                        data:'',
+                        success: function(r2){
+                            $('#qr').html('<img src=\"'+r2+'\" />');
+                        },
+                    });
+
+
                     $('#submit-button').hide();
                     $('#link-url').on('focus', function(){
                       $(this).blur(); 
