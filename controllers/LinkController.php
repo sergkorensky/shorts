@@ -106,16 +106,12 @@ class LinkController extends Controller
                         'id' => $model->id,
                         'short_url' => $short_url,
                     ];
-
-                    //return $this->redirect(['view', 'id' => $model->id]);
-                    
+                                        
                     return $data;
 
                  }
 
-
             }
-
         
 
             if (0 && $model->load($this->request->post()) && $model->save()) {//это надо заменили на валидацию по ajax и в случае успеха - сохранение и ответ

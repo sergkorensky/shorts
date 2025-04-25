@@ -17,10 +17,10 @@ use yii\widgets\ActiveForm;
     
     $form = ActiveForm::begin(['id'=>'link-form']); ?>
 
-    <?= $form->field($model, 'url', ['enableAjaxValidation' => true, 'validateOnBlur'=> false, 'validateOnChange'=> false,])->textInput(['maxlength' => true]) ?>
+    <?= $form->field($model, 'url', ['enableAjaxValidation' => true, 'validateOnBlur'=> false, 'validateOnChange'=> false,])->textInput(['maxlength' => true, 'id' => 'link-url']) ?>
 
     <div class="form-group">
-        <?= Html::submitButton('Ok', ['class' => 'btn btn-success', 'id' => 'submit-button']) ?>
+        <?= Html::submitButton('Ok', ['class' => 'btn btn-success',  'id' => 'submit-button']) ?>
     </div>
 
     
@@ -35,49 +35,25 @@ use yii\widgets\ActiveForm;
 <?php
 $js = <<<JS
     $('#link-form').on('beforeSubmit', function(){
-        /*
-        var data = $(this).serialize();
-        var serv = $(this)[0].action;
-        //alert(serv);
-        //console.log(serv);
-        $.ajax({
-            url: serv,
-            type: 'POST',
-            data: data,
-            success: function(res){
-                console.log(res);
-                if(res.id) {
-                    var short_link = res.short_url;
-                    //$('#short_res').append(short_link);                    
-                    //$('#submit-button').hide();
-                    //return false;
-                }
-            },
-            error: function(){
-                alert('Error!');
-            }
-        });
-*/
+        
         return false;
     });
 JS;
 
+$js2 = "$('#link-form').on('ajaxComplete', function (event, jqXHR, textStatus) {
+    //alert(JSON.stringify(jqXHR));
 
-$js2 = "$('#link-form').on('ajaxComplete', function (event, jqXHR, textStatus) {//
-//alert(JSON.stringify(jqXHR));
-console.log(jqXHR.responseText);
+    var res = jqXHR.responseJSON;
 
-var res = jqXHR.responseJSON;
-
-if(res.id) {
+    if(res.id) {
                     var short_link = res.short_url;
                     $('#short_res').html(short_link);                    
                     $('#submit-button').hide();
+                    $('#link-url').on('focus', function(){
+                      $(this).blur(); 
+                     });
                     
                 }
-
-event.preventDefault();
-return false;
 
 });
 ";
