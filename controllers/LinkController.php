@@ -3,6 +3,8 @@
 namespace app\modules\shorts\controllers;
 
 use app\modules\shorts\models\Link;
+use app\modules\shorts\models\Ip;
+use app\modules\shorts\models\Log;
 use yii\data\ActiveDataProvider;
 use yii\web\Controller;
 use yii\web\Response;
@@ -114,7 +116,7 @@ class LinkController extends Controller
             }
         
 
-            if (0 && $model->load($this->request->post()) && $model->save()) {//это надо заменили на валидацию по ajax и в случае успеха - сохранение и ответ
+            if (0 && $model->load($this->request->post()) && $model->save()) {
 
                 if(\Yii::$app->request->isAjax){
                     //return $model->id;
@@ -166,6 +168,51 @@ class LinkController extends Controller
         $this->findModel($id)->delete();
 
         return $this->redirect(['index']);
+    }
+
+
+    /**
+     * Redirect by a short Link
+     * @param int $q ID
+     * @return string
+     * @throws NotFoundHttpException if the model cannot be found
+     */
+    public function actionGoto($q)
+    {
+        $link = $this->findModel($q);
+        $link_url = $link->url;
+        $link_id = $link->id;
+
+        $user_ip = $_SERVER['REMOTE_ADDR'];
+
+        if (($ip = Ip::findOne(['ip' => $user_ip])) !== null) {
+            $ip_id = $ip->id;
+        }
+        else {
+            $ip = new Ip;
+            $ip->ip = $user_ip;
+            $ip->save();
+            $ip_id = $ip->id;
+
+        }
+
+        $log = Log::findOne([
+            'link_id' => $link_id,
+            'ip_id' => $ip_id,
+        ]);
+
+        if ($log !== null) {
+            $log->count = $log->count + 1;
+
+        } else{
+            $log = new Log;
+            $log->count =  1;
+            $log->link_id = $link_id;
+            $log->ip_id = $ip_id;
+        }
+        $log->save();
+        
+        return $this->redirect($link_url);
     }
 
     /**
